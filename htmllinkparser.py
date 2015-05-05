@@ -13,4 +13,5 @@ class HTMLLinkFinder(HTMLParser.HTMLParser):
             for attr in attrs:
                 if(attr[0] == "href"):
                     link = attr[1].strip("//")
-                    self.links.append(urlparse.urljoin(self.url, link))
+                    if(link.strip(" /") != self.url.strip(" /")):
+                        self.links.append(urlparse.urljoin(self.url, link))
