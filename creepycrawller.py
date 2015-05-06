@@ -16,7 +16,7 @@ class Crawl():
         except (UnicodeDecodeError, TypeError), e:
             print e
 
-        return {"links":parser.links, "images":parser.images}
+        return {"links":parser.links, "images":parser.images, "headers":parser.headers}
 
     def getPage(self, url):
         try:
