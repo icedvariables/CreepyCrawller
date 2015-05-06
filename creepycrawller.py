@@ -1,29 +1,35 @@
 ##!/usr/bin/env python
 
-import urllib2, threading
-import htmllinkparser
+import urllib2, threading, urlparse
+import creepyhtmlparser
 
 class Crawl():
-    def __init__(self, site):
-        self.site = site
-        self.index = site.split("/")[0]
-        self.indexLinks = self.findLinks(self.index)
+    def __init__(self, url):
+        self.url = url
 
-    def findLinks(self, page):
-        raw = self.getPage(page)
+    def parsePage(self):
+        raw = self.getPage(self.url)
 
-        parser = htmllinkparser.HTMLLinkFinder(self.site)
+        parser = creepyhtmlparser.CreepyHTMLParser(self.url)
         try:
             parser.feed(raw)
-        except UnicodeDecodeError, e:
-            print "Invalid characters:", e
-        return parser.links
+        except (UnicodeDecodeError, TypeError), e:
+            print e
+
+        return {"links":parser.links, "images":parser.images}
 
     def getPage(self, url):
-        page = urllib2.urlopen("http://" + url)
+        try:
+            u = url
+            if not(urlparse.urlparse(u).scheme):
+                u = "http://" + u
+            page = urllib2.urlopen(u)
+        except urllib2.URLError, e:
+            return e
+
         data = page.read()
         return data
 
 if __name__=="__main__":
-    c = Crawl("stackoverflow.com/")
-    print c.indexLinks
+    c = Crawl("google.com")
+    print c.parsePage()
