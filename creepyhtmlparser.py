@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-import HTMLParser, urlparse
+import HTMLParser, urlparse, urllib2
 
 class CreepyHTMLParser(HTMLParser.HTMLParser):
     def __init__(self, url):
@@ -13,6 +11,28 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         self.headers = []
 
         self._header = False
+
+    def parsePage(self):
+        raw = self.getPage(self.url)
+
+        try:
+            self.feed(raw)
+        except (UnicodeDecodeError, TypeError), e:
+            print e
+
+        return {"links":self.links, "images":self.images, "headers":self.headers}
+
+    def getPage(self, url):
+        try:
+            u = url
+            if not(urlparse.urlparse(u).scheme):
+                u = "http://" + u
+            page = urllib2.urlopen(u)
+        except urllib2.URLError, e:
+            return e
+
+        data = page.read()
+        return data
 
     def handle_starttag(self, tag, attrs):
         if(tag == "a"):
@@ -44,3 +64,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
             link = link._replace(netloc=self.url)
 
         return link.geturl()
+
+
+if __name__=="__main__":
+    c = CreepyHTMLParser("google.com")
+    print c.parsePage()
