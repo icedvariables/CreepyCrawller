@@ -1,14 +1,17 @@
-import HTMLParser, urlparse, urllib2
+import HTMLParser, urlparse, urllib2, re
 
 class CreepyHTMLParser(HTMLParser.HTMLParser):
     def __init__(self, url):
         HTMLParser.HTMLParser.__init__(self)
         self.HEADER_TAGS = ("h1", "h2", "h3", "h4", "h5", "h6")
+        self.RE_EMAIL = re.compile(r"[a-zA-Z\._]+@\w+\.\w+(\.\w+)?")
+
         self.url = url
 
         self.links = []
         self.images = []
         self.headers = []
+        self.emails = []
 
         self._header = False
 
@@ -20,7 +23,9 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         except (UnicodeDecodeError, TypeError), e:
             print e
 
-        return {"links":self.links, "images":self.images, "headers":self.headers}
+        self.emails += self.findEmails(raw)
+
+        return {"links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
 
     def getPage(self, url):
         try:
@@ -65,7 +70,13 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
         return link.geturl()
 
+    def findEmails(self, data):
+        emails = []
+        for email in self.RE_EMAIL.finditer(data):
+            emails.append(email.group(0).strip())
+        return emails
+
 
 if __name__=="__main__":
-    c = CreepyHTMLParser("google.com")
+    c = CreepyHTMLParser("http://www.sistersofspam.co.uk/Scam_Email_Addresses_1.php")
     print c.parsePage()
