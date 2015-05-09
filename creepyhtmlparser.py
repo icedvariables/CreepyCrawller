@@ -16,6 +16,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         self._header = False
 
     def parsePage(self):
+        """Find links, images, emails, etc on a webpage"""
+
         raw = self.getPage(self.url)
 
         if(isinstance(raw, urllib2.URLError)):
@@ -32,6 +34,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         return {"links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
 
     def getPage(self, url):
+        """Fetch a page over HTTP"""
+
         try:
             page = urllib2.urlopen(url)
         except urllib2.URLError, e:
@@ -63,6 +67,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
             self.headers.append(data)
 
     def makeAbsolute(self, url):
+        """Make a url absolute ('/foo/bar' on 'site.com' would become 'site.com/foo/bar')"""
+
         link = urlparse.urlparse(url)
         if not(link.scheme):
             link = link._replace(scheme="http")
@@ -75,11 +81,14 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         if(url.startswith("http://http")):
             url = url[7:]
 
+        # Remove self-links
         url = url.split("#")[0]
 
         return url
 
     def findEmails(self, data):
+        """Returns an array of email address in data"""
+
         if(data):
             emails = []
             for email in self.RE_EMAIL.finditer(data):
