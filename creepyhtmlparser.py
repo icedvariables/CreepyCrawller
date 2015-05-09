@@ -7,6 +7,7 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         self.RE_EMAIL = re.compile(r"[a-zA-Z\._]+@\w+\.\w+(\.\w+)?")
 
         self.url = url
+        self.domain = urlparse.urlparse(url).netloc
 
         self.links = []
         self.images = []
@@ -73,7 +74,7 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         if not(link.scheme):
             link = link._replace(scheme="http")
         if not(link.netloc):
-            link = link._replace(netloc=self.url)
+            link = link._replace(netloc=self.domain)
 
         url = link.geturl()
 
