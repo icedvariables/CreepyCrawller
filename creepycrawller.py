@@ -1,3 +1,4 @@
+import sys
 from creepyhtmlparser import CreepyHTMLParser
 
 crawlledLinks = []
@@ -19,4 +20,7 @@ def crawl(page):
             crawl(link)
 
 if __name__=="__main__":
-    crawl("http://ludumdare.com/compo")
+    if(len(sys.argv) > 1):
+        crawl(sys.argv[1])
+    else:
+        print "Please specify a page to start crawlling on"

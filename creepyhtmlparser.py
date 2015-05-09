@@ -1,4 +1,4 @@
-import HTMLParser, urlparse, urllib2, re
+import HTMLParser, urlparse, urllib2, re, sys
 
 class CreepyHTMLParser(HTMLParser.HTMLParser):
     def __init__(self, url):
@@ -111,5 +111,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
 
 if __name__=="__main__":
-    c = CreepyHTMLParser("http://www.sistersofspam.co.uk/Scam_Email_Addresses_1.php")
+    if(len(sys.argv) > 1):
+        c = CreepyHTMLParser(sys.argv[1])
+    else:
+        print "Please specify a page to start crawlling on"
     print c.parsePage()
