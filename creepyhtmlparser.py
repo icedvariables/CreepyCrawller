@@ -9,11 +9,13 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         self.url = url
         self.domain = urlparse.urlparse(url).netloc
 
+        self.title = url
         self.links = []
         self.images = []
         self.headers = []
         self.emails = []
 
+        self._title = False
         self._header = False
 
     def parsePage(self):
@@ -32,7 +34,7 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
         self.emails += self.findEmails(raw)
 
-        return {"links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
+        return {"title":self.title, "links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
 
     def getPage(self, url):
         """Fetch a page over HTTP"""
@@ -56,6 +58,9 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
                 if(attr[0] == "src"):
                     self.images.append(self.makeAbsolute(attr[1]))
 
+        if(tag == "title"):
+            self._title = True
+
         if(tag in self.HEADER_TAGS):
             self._header = True
 
@@ -63,9 +68,15 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         if(tag in self.HEADER_TAGS):
             self._header = False
 
+        if(tag == "title"):
+            self._title = False
+
     def handle_data(self, data):
         if(self._header):
             self.headers.append(data)
+
+        if(self._title):
+            self.title = data
 
     def makeAbsolute(self, url):
         """Make a url absolute ('/foo/bar' on 'site.com' would become 'site.com/foo/bar')"""
