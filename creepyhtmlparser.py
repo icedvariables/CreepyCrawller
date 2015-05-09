@@ -34,6 +34,9 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
         self.emails += self.findEmails(raw)
 
+        # Remove empty headers
+        self.headers = filter(None, self.headers)
+
         return {"title":self.title, "links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
 
     def getPage(self, url):
@@ -73,7 +76,7 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
     def handle_data(self, data):
         if(self._header):
-            self.headers.append(data)
+            self.headers.append(data.strip())
 
         if(self._title):
             self.title = data
