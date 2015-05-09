@@ -18,6 +18,10 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
     def parsePage(self):
         raw = self.getPage(self.url)
 
+        if(isinstance(raw, urllib2.URLError)):
+            print "Failed to get page:", self.url, "error:", raw
+            return
+
         try:
             self.feed(raw)
         except (UnicodeDecodeError, TypeError), e:
@@ -29,10 +33,7 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
     def getPage(self, url):
         try:
-            u = url
-            if not(urlparse.urlparse(u).scheme):
-                u = "http://" + u
-            page = urllib2.urlopen(u)
+            page = urllib2.urlopen(url)
         except urllib2.URLError, e:
             return e
 
@@ -68,13 +69,22 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         if not(link.netloc):
             link = link._replace(netloc=self.url)
 
-        return link.geturl()
+        url = link.geturl()
+
+        # just in case the urlparse method doesn't work
+        if(url.startswith("http://http")):
+            url = url[7:]
+
+        return url
 
     def findEmails(self, data):
-        emails = []
-        for email in self.RE_EMAIL.finditer(data):
-            emails.append(email.group(0).strip())
-        return emails
+        if(data):
+            emails = []
+            for email in self.RE_EMAIL.finditer(data):
+                emails.append(email.group(0).strip())
+            return emails
+
+        return []
 
 
 if __name__=="__main__":
