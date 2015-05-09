@@ -5,8 +5,6 @@ crawlledLinks = []
 def crawl(page):
     global crawlledLinks
 
-    print "Crawlled links:", crawlledLinks
-
     c = CreepyHTMLParser(page)
     parsed = c.parsePage()
 
@@ -21,4 +19,4 @@ def crawl(page):
             crawl(link)
 
 if __name__=="__main__":
-    crawl("http://ebay.co.uk")
+    crawl("http://ludumdare.com/compo")
