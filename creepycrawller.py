@@ -1,6 +1,12 @@
 from creepyhtmlparser import CreepyHTMLParser
 
+crawlledLinks = []
+
 def crawl(page):
+    global crawlledLinks
+
+    print "Crawlled links:", crawlledLinks
+
     c = CreepyHTMLParser(page)
     parsed = c.parsePage()
 
@@ -10,7 +16,9 @@ def crawl(page):
     print page, ":", parsed, "\n"
 
     for link in parsed["links"]:
-        crawl(link)
+        if not(link.strip() in crawlledLinks):
+            crawlledLinks.append(link.strip())
+            crawl(link)
 
 if __name__=="__main__":
-    crawl("http://www.dreamdawn.com/sh/")
+    crawl("http://ebay.co.uk")

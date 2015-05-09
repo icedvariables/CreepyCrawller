@@ -75,6 +75,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         if(url.startswith("http://http")):
             url = url[7:]
 
+        url = url.split("#")[0]
+
         return url
 
     def findEmails(self, data):
