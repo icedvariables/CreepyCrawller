@@ -10,6 +10,8 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         self.domain = urlparse.urlparse(url).netloc
 
         self.title = url
+        self.description = ""
+        self.keywords = []
         self.links = []
         self.images = []
         self.headers = []
@@ -37,7 +39,7 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
         # Remove empty headers
         self.headers = filter(None, self.headers)
 
-        return {"title":self.title, "links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
+        return {"title":self.title, "description":self.description, "keywords":self.keywords, "links":self.links, "images":self.images, "headers":self.headers, "emails":self.emails}
 
     def getPage(self, url):
         """Fetch a page over HTTP"""
@@ -63,6 +65,20 @@ class CreepyHTMLParser(HTMLParser.HTMLParser):
 
         if(tag == "title"):
             self._title = True
+
+        if(tag == "meta"):
+            content = ""
+            for attr in attrs:
+                if(attr[0] == "content"):
+                    content = attr[1]
+
+            for attr in attrs:
+                if(attr[0] == "name"):
+                    if(attr[1].lower() == "description"):
+                        self.description = content
+                    if(attr[1].lower() == "keywords"):
+                        self.keywords = content.split(",")
+
 
         if(tag in self.HEADER_TAGS):
             self._header = True
